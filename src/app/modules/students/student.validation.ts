@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "zod";
 
 const studentNameZodSchema = z.object({
   firstName: z.string().min(1).max(255),
@@ -35,7 +35,7 @@ const studentZodSchema = z.object({
   prasendAddress: z.string().min(1).max(255),
   guardiant: guardiantZodSchema,
   localGuardiant: localGuardiantZodSchema,
-  profileImg: z.string().url(),
+  profileImg: z.string(),
 });
 
 export default studentZodSchema;

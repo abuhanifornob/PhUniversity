@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export type TStudentName = {
   firstName: string;
   middleName?: string;
@@ -20,6 +22,7 @@ export type TLocalGuardiant = {
 
 export type TStudent = {
   id: string;
+  user: Types.ObjectId;
   name: TStudentName;
   gender: "male" | "female";
   dateOfBirth: string;

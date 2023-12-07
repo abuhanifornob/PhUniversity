@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+
 import {
   TGuardiant,
   TLocalGuardiant,
@@ -57,6 +58,12 @@ const studentSchema = new Schema<TStudent>({
     required: [true, "Please tel us your Id"],
     unique: true,
   },
+  user: {
+    type: Schema.Types.ObjectId,
+    required: [true, "User is Required"],
+    unique: true,
+    ref: "User",
+  },
   name: {
     type: studentNameSchema,
     required: [true, "Please tel us your Last name"],
@@ -114,8 +121,7 @@ const studentSchema = new Schema<TStudent>({
   },
   profileImg: {
     type: String,
-    required: [true, "Profile Image URL is required"],
   },
 });
 
-const Student = model<TStudent>("Student", studentSchema);
+export const Student = model<TStudent>("Student", studentSchema);
