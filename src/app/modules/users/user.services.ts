@@ -6,16 +6,17 @@ import { TUser } from "./user.interface";
 import { User } from "./user.model";
 
 const createStudentIntoDB = async (password: string, studnetData: TStudent) => {
+  // partial User Data type Chek
   const userData: Partial<TUser> = {};
   userData.password = password || (config.default_password as string);
-  userData.id = "203001";
+  userData.id = "203003";
   userData.role = "student";
-  console.log(userData);
+  // Create user Data
   const newUser = await User.create(userData);
-  console.log(newUser);
   if (Object.keys(newUser).length) {
     studnetData.id = newUser.id;
     studnetData.user = newUser._id;
+    // Create Studnt Data
     const newStudent = await Student.create(studnetData);
     return newStudent;
   }

@@ -6,4 +6,4 @@ const router = express.Router();
 
 router.post("/create-student", StudentController.createStudent);
 
-export const StudetRouters = router;
+export const StudentRoutes = router;
