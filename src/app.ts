@@ -5,11 +5,6 @@ import cors from "cors";
 import router from "./app/routes";
 import globalErrorHandler from "./app/middleware/globalErrorHandler";
 import notFoundRoute from "./app/middleware/notFountRoute";
-import {
-  StudetRouters,
-  StudetRoutes,
-} from "./app/modules/students/student.routes";
-import { UserRoutes } from "./app/modules/users/user.routes";
 
 const app = express();
 

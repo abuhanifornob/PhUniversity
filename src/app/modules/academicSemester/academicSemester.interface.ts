@@ -1,3 +1,5 @@
+import { string } from "zod";
+
 export type TMonth =
   | "January"
   | "February"
@@ -20,4 +22,8 @@ export type TAcademicSemester = {
   code: TAcademicSemesterCode;
   startMonth: TMonth;
   endMonth: TMonth;
+};
+
+export type TAcademicSemesterNameCodeMapper = {
+  [key: string]: string;
 };
