@@ -19,6 +19,7 @@ const updateAcademicDepartmentIntoDB = async (
   id: string,
   paylod: Partial<TAcademciDepartment>
 ) => {
+  // Check Update id is Exits ro not Exists
   const isDepartmentIdExit = await AcademicDepartment.findOne({
     _id: id,
   });

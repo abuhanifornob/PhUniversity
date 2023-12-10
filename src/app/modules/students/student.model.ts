@@ -1,5 +1,8 @@
 import { Schema, model } from "mongoose";
 
+import { AcademicDepartment } from "../academicDepartment/academicDepartment.model";
+import { AcademicSemester } from "../academicSemester/academicSemester.model";
+
 import {
   TGuardiant,
   TLocalGuardiant,
@@ -122,9 +125,17 @@ const studentSchema = new Schema<TStudent>({
   profileImg: {
     type: String,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
   admissionSemester: {
     type: Schema.Types.ObjectId,
-    ref: "AcademicSemester",
+    ref: AcademicSemester,
+  },
+  academicDepartment: {
+    type: Schema.Types.ObjectId,
+    ref: AcademicDepartment,
   },
 });
 

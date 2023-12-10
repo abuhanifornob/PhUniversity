@@ -1,4 +1,7 @@
 import { Schema, model } from "mongoose";
+
+import { AcademicFaculty } from "../academicFaculty/academicFaculty.model";
+
 import { TAcademciDepartment } from "./academicDepartment.interface";
 
 export const academicDepartmentSchema = new Schema<TAcademciDepartment>({
@@ -9,7 +12,7 @@ export const academicDepartmentSchema = new Schema<TAcademciDepartment>({
   },
   academicFaculty: {
     type: Schema.Types.ObjectId,
-    ref: "AcademicFaculty",
+    ref: AcademicFaculty,
   },
 });
 
@@ -23,14 +26,14 @@ academicDepartmentSchema.pre("save", async function (next) {
   next();
 });
 
-academicDepartmentSchema.pre("findByIdAndUpdate", async function (next) {
-  const quary = this.getQuery();
-  const isDepartmentIdExits = await AcademicDepartment.findOne(quary);
-  if (!isDepartmentIdExits) {
-    throw new Error("This id Don't Exitt !!");
-  }
-  next();
-});
+// academicDepartmentSchema.pre("findByIdAndUpdate", async function (next) {
+//   const quary = this.getQuery();
+//   const isDepartmentIdExits = await AcademicDepartment.findOne(quary);
+//   if (!isDepartmentIdExits) {
+//     throw new Error("This id Don't Exitt !!");
+//   }
+//   next();
+// });
 
 export const AcademicDepartment = model<TAcademciDepartment>(
   "academicDepartment",
