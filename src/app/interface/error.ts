@@ -3,6 +3,10 @@ export type TErrorSources = {
   message: string;
 }[];
 
+export type TTestError = {
+  errorMessage: string;
+};
+
 export type TGenericErrorResponse = {
   statusCode: number;
   message: string;

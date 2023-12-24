@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 import { TErrorSources, TGenericErrorResponse } from "../interface/error";
 
 const handleCastError = (
@@ -10,7 +11,9 @@ const handleCastError = (
       message: err?.message,
     },
   ];
+  console.log(err?.value);
   const statusCode = 400;
+
   return {
     statusCode,
     message: "invalide Id",
