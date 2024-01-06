@@ -7,6 +7,7 @@ import { AcademicDepartment } from "../academicDepartment/academicDepartment.mod
 import { AcademicSemester } from "../academicSemester/academicSemester.model";
 import { TAdmin } from "../admin/admin.interface";
 import { Admin } from "../admin/admin.model";
+import { verifyToken } from "../auth/auth.utils";
 import { TFaculty } from "../faculty/faculty.interface";
 import { Faculty } from "../faculty/faculty.model";
 import { TStudent } from "../students/student.interface";
@@ -20,12 +21,18 @@ import {
   generateFacultyId,
   generateStudentId,
 } from "./user.utils";
+import { sendImageToCloudinary } from "../../utils/sendImageToCloudinary";
 
-const createStudentIntoDB = async (password: string, payload: TStudent) => {
+const createStudentIntoDB = async (
+  file: any,
+  password: string,
+  payload: TStudent
+) => {
   // partial User Data type Chek
   const userData: Partial<TUser> = {};
   userData.password = password || (config.default_password as string);
   userData.role = "student";
+  userData.email = payload.email;
 
   // find academic semester info
   const admissionSemester: any = await AcademicSemester.findById(
@@ -42,8 +49,15 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     if (!newUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, "Faild to Create User");
     }
+
+    const imageName = `${userData.id}${payload?.name?.firstName}`;
+    const path = file?.path;
+
+    // Image send to Clouding ..................
+    const { secure_url } = await sendImageToCloudinary(imageName, path);
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; // Reference Id
+    payload.profileImg = secure_url;
 
     // Create Studnt Data (transection-2)
     const newStudent = await Student.create([payload], { session }); // we get array data
@@ -60,10 +74,15 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   }
 };
 
-const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
+const createFacultyIntoDB = async (
+  file: any,
+  password: string,
+  payload: TFaculty
+) => {
   const userData: Partial<TUser> = {};
   userData.password = password || (config.default_password as string);
   userData.role = "faculty";
+  userData.email = payload.email;
   // find academic department info
   const academicDepartment = await AcademicDepartment.findById(
     payload.academicDepartment
@@ -82,12 +101,15 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
       throw new AppError(httpStatus.BAD_REQUEST, "User Create is Fail!!!");
     }
 
-    console.log(newUser);
-    console.log("payload is:", payload);
+    const imageName = `${userData.id}${payload?.name?.firstName}`;
+    const path = file?.path;
 
-    //now Create Student
+    // Image send to Clouding ..................
+    const { secure_url } = await sendImageToCloudinary(imageName, path);
+    //now Create Faculty
     payload.id = newUser[0].id;
-    payload.user = newUser[0]._id; // Reference Id
+    payload.user = newUser[0]._id;
+    payload.profileImg = secure_url;
 
     const newFaculty = await Faculty.create([payload], { session });
     if (!newFaculty.length) {
@@ -103,10 +125,15 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   }
 };
 
-export const createAdminIntoDb = async (password: string, payload: TAdmin) => {
+export const createAdminIntoDb = async (
+  file: any,
+  password: string,
+  payload: TAdmin
+) => {
   let userData: Partial<TUser> = {};
   userData.password = password || (config.default_password as string);
   userData.role = "admin";
+  userData.email = payload.email;
 
   const session = await mongoose.startSession();
   try {
@@ -117,12 +144,17 @@ export const createAdminIntoDb = async (password: string, payload: TAdmin) => {
     if (!newUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, "User Create Faild");
     }
+    const imageName = `${userData.id}${payload?.name?.firstName}`;
+    const path = file?.path;
+
+    // Image send to Clouding ..................
+    const { secure_url } = await sendImageToCloudinary(imageName, path);
 
     // Admin Create
-    console.log("new User is", newUser);
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id;
-    console.log("admin Payload Data is", payload);
+    payload.profileImg = secure_url;
+
     const newAdmin = await Admin.create([payload], { session });
     if (!newAdmin.length) {
       throw new AppError(httpStatus.BAD_REQUEST, "Admin Create Faild");
@@ -136,8 +168,33 @@ export const createAdminIntoDb = async (password: string, payload: TAdmin) => {
     throw new Error(error);
   }
 };
+
+const getMe = async (userId: string, userRole: string) => {
+  let result = null;
+  if (userRole === "student") {
+    result = await Student.findOne({ id: userId });
+    // .populate("user")
+  }
+  if (userRole === "admin") {
+    result = await Admin.findOne({ id: userId }).populate("user");
+  }
+  if (userRole === "faculty") {
+    result = await Faculty.findOne({ id: userId }).populate("user");
+  }
+
+  return result;
+};
+const changeStatus = async (id: string, payload: { status: string }) => {
+  const result = await User.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+
+  return result;
+};
 export const UserServices = {
   createStudentIntoDB,
   createFacultyIntoDB,
   createAdminIntoDb,
+  getMe,
+  changeStatus,
 };

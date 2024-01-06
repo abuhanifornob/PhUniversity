@@ -1,19 +1,27 @@
 import { Schema, model } from "mongoose";
 
-import { TUser } from "./user.interface";
 import bcrypt from "bcrypt";
+
 import config from "../../config";
 
-const userSchema = new Schema<TUser>(
+import { TUser, UserModel } from "./user.interface";
+
+const userSchema = new Schema<TUser, UserModel>(
   {
     id: {
       type: String,
       required: [true, "Id is Required"],
       unique: true,
     },
+    email: {
+      type: String,
+      required: [true, "Email is Required"],
+      unique: true,
+    },
     password: {
       type: String,
       required: [true, "Password is required"],
+      select: 0,
     },
     needsPasswordChange: {
       type: Boolean,
@@ -33,6 +41,9 @@ const userSchema = new Schema<TUser>(
       type: Boolean,
       default: false,
     },
+    passwordChangedAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
@@ -51,4 +62,33 @@ userSchema.post("save", async function (doc, next) {
   next();
 });
 
-export const User = model<TUser>("user", userSchema);
+userSchema.statics.isUserExitsByCustomId = async function (id: string) {
+  return await User.findOne({ id }).select("+password");
+};
+userSchema.statics.isUserDeleted = async function (isDeleted: boolean) {
+  return isDeleted;
+};
+userSchema.statics.isUserBlocked = async function (isBlocked: string) {
+  return isBlocked === "blocked";
+};
+userSchema.statics.isPasswordMatch = async function (
+  planTextPassword: string,
+  hashedPassword: string
+) {
+  const isPasswordMatch = await bcrypt.compare(
+    planTextPassword,
+    hashedPassword
+  );
+  return isPasswordMatch;
+};
+
+userSchema.statics.isJWTIssuedBeforePasswordChanged = async function (
+  passwordChangedTimestamp,
+  jwtIssuedTimestamp
+) {
+  const getPassworChangeTime = new Date(passwordChangedTimestamp).getTime();
+  const convertMilisecondPasswordChangedTime = getPassworChangeTime / 1000;
+
+  return convertMilisecondPasswordChangedTime > jwtIssuedTimestamp;
+};
+export const User = model<TUser, UserModel>("user", userSchema);

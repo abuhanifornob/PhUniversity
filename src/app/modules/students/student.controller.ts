@@ -9,6 +9,7 @@ import { StudentServices } from "./student.services";
 
 const getallStudent = catchAsync(async (req, res) => {
   const result = await StudentServices.getAllStudentFromBD(req.query);
+  console.log("Cookis is ", req.cookies);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

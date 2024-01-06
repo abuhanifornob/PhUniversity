@@ -2,6 +2,8 @@ import express, { NextFunction, Request, Response } from "express";
 
 import cors from "cors";
 
+import cookieParser from "cookie-parser";
+
 import router from "./app/routes";
 import globalErrorHandler from "./app/middleware/globalErrorHandler";
 import notFoundRoute from "./app/middleware/notFountRoute";
@@ -9,7 +11,8 @@ import notFoundRoute from "./app/middleware/notFountRoute";
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({ origin: ["http://localhost:5173"] }));
 
 app.use("/api/v1/", router);
 

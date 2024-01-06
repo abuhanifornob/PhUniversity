@@ -2,6 +2,7 @@ import { Schema, model } from "mongoose";
 
 import { AcademicDepartment } from "../academicDepartment/academicDepartment.model";
 import { AcademicSemester } from "../academicSemester/academicSemester.model";
+import { User } from "../users/user.model";
 
 import {
   TGuardiant,
@@ -65,7 +66,7 @@ const studentSchema = new Schema<TStudent>({
     type: Schema.Types.ObjectId,
     required: [true, "User is Required"],
     unique: true,
-    ref: "User",
+    ref: User,
   },
   name: {
     type: studentNameSchema,
